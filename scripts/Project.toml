@@ -1,0 +1,49 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+CFTime = "179af706-886a-5703-950a-314cd64e0468"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+ComponentArrays = "b0b7db55-cfe3-40fc-9ded-d10e2dbeff66"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
+EllipsisNotation = "da5c29d0-fa7d-589e-88eb-ea29b0a81949"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
+LuxCUDA = "d0bbae9a-e099-4d5b-a835-1c6931763bda"
+NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
+NNlib = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
+NODEData = "56c15bac-5c7d-45b6-b0e6-74117a5d8120"
+NetCDF = "30363a11-5582-574a-97bb-aa9a979735b9"
+NeuralDELux = "42edd903-6642-4dc2-93f6-9358071582bf"
+NeuralQG3 = "a8a6a3b9-0890-444a-a81e-bdebca719e0b"
+Optimisers = "3bd65402-5787-11e9-1adc-39752487f4e2"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+ParameterSchedulers = "d7d3b36b-41b8-4d0d-a2bf-768c6151755e"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
+ProfileSVG = "132c30aa-f267-4189-9183-c8a63c7e05e6"
+ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"
+QG3 = "d558103f-7907-4730-8f30-3d9252e5a318"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+SciMLSensitivity = "1ed8b502-d754-442c-8d5d-10ac956f44a1"
+SlurmHyperopt = "cc751f0e-ca47-473a-90b9-8165154f6533"
+SpeedyWeather = "9e226e20-d153-4fed-8a5b-493def4f21a9"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+cuDNN = "02a925ec-e4fe-4b08-9a7e-0d78e3d38ccd"
+
+[compat]
+SpeedyWeather = "=0.10.0"
+
+[extras]
+CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
+
+[sources]
+NeuralDELux = {url = "https://github.com/maximilian-gelbrecht/NeuralDELux.jl"}
+QG3 = {url = "https://github.com/maximilian-gelbrecht/QG3.jl.git"}
+NODEData = {url = "https://github.com/maximilian-gelbrecht/NODEData.jl.git"}
+SlurmHyperopt = {url = "https://github.com/maximilian-gelbrecht/SlurmHyperopt.jl.git"}

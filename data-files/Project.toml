@@ -1,0 +1,8 @@
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+NODEData = "56c15bac-5c7d-45b6-b0e6-74117a5d8120"
+NeuralDELux = "42edd903-6642-4dc2-93f6-9358071582bf"
+NeuralQG3 = "a8a6a3b9-0890-444a-a81e-bdebca719e0b"
+QG3 = "d558103f-7907-4730-8f30-3d9252e5a318"
+SpeedyWeather = "9e226e20-d153-4fed-8a5b-493def4f21a9"
