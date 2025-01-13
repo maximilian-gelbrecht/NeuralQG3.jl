@@ -1,0 +1,13 @@
+name = "NeuralQG3"
+uuid = "8343f97a-87f0-49b7-a1ea-f56d26627160"
+authors = ["Maximilian Gelbrecht <maximilian.gelbrecht@posteo.de> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
