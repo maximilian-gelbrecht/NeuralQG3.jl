@@ -50,10 +50,14 @@ CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
 ParameterSchedulers = "d7d3b36b-41b8-4d0d-a2bf-768c6151755e"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
-[sources]
-NeuralDELux = {url = "https://github.com/maximilian-gelbrecht/NeuralDELux.jl"}
-QG3 = {url = "https://github.com/maximilian-gelbrecht/QG3.jl.git"}
-NODEData = {url = "https://github.com/maximilian-gelbrecht/NODEData.jl.git"}
+[sources.NODEData]
+url = "https://github.com/maximilian-gelbrecht/NODEData.jl.git"
+
+[sources.NeuralDELux]
+url = "https://github.com/maximilian-gelbrecht/NeuralDELux.jl"
+
+[sources.QG3]
+url = "https://github.com/maximilian-gelbrecht/QG3.jl.git"
 
 [targets]
 test = ["ParameterSchedulers", "Test"]
