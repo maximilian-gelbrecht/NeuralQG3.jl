@@ -11,7 +11,7 @@ The physics-based core of the PseudoSpectralNet is taken directly from the imple
 
 ## Installation 
 
-This package depends on several unregistered packages. Julia 1.11 should be able to instantiate those as their URLs are given in the respective `Project.toml` files. If this isn't working or you are using an older Julia version, please inspect the `[sources]` section of `Project.toml` and add those unregistered packages manually. 
+This package depends on several unregistered packages. Julia 1.11 should be able to instantiate those as their URLs are given in the respective `Project.toml` files. However, there are currently multiple problems with this. If this isn't working or you are using an older Julia version, please inspect the `[sources]` section of `Project.toml` and add those unregistered packages manually. 
 
 In order to run the Speedy experiment with the same data, we used, you can download it from [here (with password "speedy-data")](https://cloud.pik-potsdam.de/index.php/s/g43p23Eoza8sTf8) and put in the `data-files/speedy` folder. 
 
