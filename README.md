@@ -4,6 +4,7 @@
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://maximilian-gelbrecht.github.io/NeuralQG3.jl/dev/)
 [![Build Status](https://github.com/maximilian-gelbrecht/NeuralQG3.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/maximilian-gelbrecht/NeuralQG3.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![DOI](https://zenodo.org/badge/916274970.svg)](https://doi.org/10.5281/zenodo.14711057)
 
 Here, [QG3.jl](https://github.com/maximilian-gelbrecht/QG3.jl.git) gets the Neural PDE treatment. All of the details and the method are outlined in the paper currently under review. Please refer to that paper for all details, here we will just present ways how to use the code in the documentation. 
 
@@ -11,7 +12,7 @@ The physics-based core of the PseudoSpectralNet is taken directly from the imple
 
 ## Installation 
 
-This package depends on several unregistered packages. Julia 1.11 should be able to instantiate those as their URLs are given in the respective `Project.toml` files. However, there are currently multiple problems with this. If this isn't working or you are using an older Julia version, please inspect the `[sources]` section of `Project.toml` and add those unregistered packages manually. 
+This package depends on several unregistered packages. Julia 1.11 should be able to instantiate those as their URLs are given in the respective `Project.toml` files. However, there are currently multiple problems and bugs that might make this fail. If this isn't working or you are using an older Julia version, please inspect the `[sources]` section of `Project.toml` and add those unregistered packages manually. 
 
 In order to run the Speedy experiment with the same data, we used, you can download it from [here (with password "speedy-data")](https://cloud.pik-potsdam.de/index.php/s/g43p23Eoza8sTf8) and put in the `data-files/speedy` folder. 
 
@@ -25,4 +26,5 @@ Unfortunately some of the dependencies of the project stopped development (e.g. 
 
 If you are using this model for any publications or other works, please cite us. 
 
-- ZENODO and ARXIV link upcoming (please get in touch with us) - 
+[![DOI](https://zenodo.org/badge/916274970.svg)](https://doi.org/10.5281/zenodo.14711057)
+
