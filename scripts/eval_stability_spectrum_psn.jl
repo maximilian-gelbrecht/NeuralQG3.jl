@@ -16,9 +16,6 @@ NAME = "psn-long-swish-newhpc-final"
 SAVE_DIR = "results/qg3-long/"
 #SAVE_DIR = "results/speedy/"
 
-i_job = length(ARGS) >= 2 ? parse(Int, ARGS[2]) : 1
-N_year = length(ARGS) >= 3 ? parse(Int, ARGS[3]) : 1
-
 other_hyperpars = NeuralQG3.training_hyperpars()
 (; N_batch, DT_FAC, data_length) = other_hyperpars
 
@@ -27,7 +24,6 @@ other_hyperpars = NeuralQG3.training_hyperpars()
 @load SAVE_NAME_MODEL psn_hyperpars
 println("Eval model with hyperpars:")
 println(psn_hyperpars.pars)
-println("Eval trajectory no.=", i_job)
 
 # load process-based core
 S, qg3ppars, ψ_0, q_0 = load_data("T42", GPU=GPU)
@@ -87,56 +83,59 @@ function average_angular_power_spectrum(A::AbstractArray{T,4}, p::QG3ModelParame
     return S 
 end 
 
+function average_angular_power_spectrum(A::AbstractArray{T,3}, p::QG3ModelParameters{T}) where T 
+    N_t = size(A,3) 
+    S = zeros(T, p.L) 
+    
+    for i=1:N_t 
+        S += angular_power_spectrum(QG3.reorder_SH_cpu(A[:,:,i],p), p)
+    end 
+    S /= N_t 
+    
+    return S 
+end 
+
 println("Now eval stability:")
 
 N_t_month = Int(floor(30 / (DT * qg3p.p.time_unit))) # 30 days
 N_t_year = N_t_month*12 # 360 days 
 
-SAVE_NAME_BASE_PSN = string(SAVE_DIR,"Spectrum-Month-PSN-")
-SAVE_NAME_TRUTH = string(SAVE_DIR,"Spectrum-Month-GT-")
+SAVE_NAME_BASE_PSN = string(SAVE_DIR,"Spectrum-Year-PSN-")
+SAVE_NAME_TRUTH = string(SAVE_DIR,"Spectrum-Year-GT-")
 
-spectrum_input = test_trajectory[2][..,i_job:i_job]
+function compute_spectra(model, ps, st, ic, save_name; N=10, N_months_res=1, N_years_evolve=5)
 
-# PSN
+    spectrum_input = ic 
 
-for i=1:10
-    # integrate dense solution 
-    res, st = neural_de_sciml((range(start=0, step=DT, length=N_t_month), spectrum_input), ps, st)
+    for i=1:N
 
-    # compute spectra 
-    S_1 = average_angular_power_spectrum(res[1,..], qg3ppars)
-    S_2 = average_angular_power_spectrum(res[2,..], qg3ppars)
-    S_3 = average_angular_power_spectrum(res[3,..], qg3ppars)
+        res, __ = model((range(start=0, step=DT, length=N_months_res*N_t_month), spectrum_input), ps, st)
 
-    # save spectra 
-    save_name_i = string(SAVE_NAME_BASE_PSN, "-",i,".jld2")
-    jldsave(save_name_i; S_1, S_2, S_3)
+        # compute spectra 
+        S_1 = average_angular_power_spectrum(res[1,..], qg3ppars)
+        S_2 = average_angular_power_spectrum(res[2,..], qg3ppars)
+        S_3 = average_angular_power_spectrum(res[3,..], qg3ppars)
+    
+        # save spectra 
+        save_name_i = string(save_name, "-m",N_months_res,"-",i,".jld2")
+        jldsave(save_name_i; S_1, S_2, S_3)
+    
+        # evolve by five years and use at new ic for next iteration
+        spectrum_input = NeuralDELux.evolve(model, ps, st, res[..,end]; N_t=N_years_evolve*N_t_year)
+        spectrum_input = reshape(spectrum_input, (size(spectrum_input)..., 1))
 
-    # evolve by five years and use at new ic for next iteration
-    spectrum_input = NeuralDELux.evolve(neural_de_sciml, ps, st, res[..,end]; N_t=5*N_t_year)
-    spectrum_input = reshape(spectrum_input, (size(spectrum_input)..., 1))
+    end 
+    return nothing 
 end 
+
+#PSN 
+compute_spectra(neural_de_sciml, ps, st, test_trajectory[2][..,end:end], SAVE_NAME_BASE_PSN, N_months_res=1)
+
+#GT 
 
 println("Done with PSN, now Ground Truth...")
 qg3_sciml = NeuralQG3.QG3Baseline(qg3p; dt=DT)
-
-for i=1:10
-    # integrate dense solution 
-    res, st = qg3_sciml((range(start=0, step=DT, length=N_t_month), spectrum_input), nothing, NamedTuple())
-
-    # compute spectra 
-    S_1 = average_angular_power_spectrum(res[1,..], qg3ppars)
-    S_2 = average_angular_power_spectrum(res[2,..], qg3ppars)
-    S_3 = average_angular_power_spectrum(res[3,..], qg3ppars)
-
-    # save spectra 
-    save_name_i = string(SAVE_NAME_BASE_TRUTH, "-",i,".jld2")
-    jldsave(save_name_i; S_1, S_2, S_3)
-
-    # evolve by five years and use at new ic for next iteration
-    spectrum_input = NeuralDELux.evolve(qg3_sciml, ps, st, res[..,end]; N_t=5*N_t_year)
-    spectrum_input = reshape(spectrum_input, (size(spectrum_input)..., 1))
-end 
+compute_spectra(qg3_sciml, nothing, NamedTuple(), test_trajectory[2][..,1,end:end], SAVE_NAME_TRUTH, N_months_res=12)
 
 println("Done with GT, finished!")
 
