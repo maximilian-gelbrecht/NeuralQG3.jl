@@ -9,12 +9,29 @@ const DEV = NeuralQG3.DetermineDevice(gpu=GPU)
 COMPUTE_DATA = true
 DATA_MODEL = :qg3 # or :speedy
 #DATA_MODEL = :speedy
-NAME = "psn-long-swish-newhpc-final" 
-#NAME = "psn-speedy-200d-sciml-filter-batch"
 
-#SAVE_DIR = ""
-SAVE_DIR = "results/qg3-long/"
-#SAVE_DIR = "results/speedy/"
+BASELINE = false 
+
+if DATA_MODEL == :qg3
+
+    if BASELINE == false 
+        NAME = "psn-long-swish-newhpc-final" 
+    else 
+        NAME = "unet-baseline-sh-qg3-2"
+    end 
+
+    SAVE_DIR = "results/qg3-long/"
+elseif DATA_MODEL == :speedy
+
+    if BASELINE == false 
+        NAME = "psn-speedy-200d-sciml-filter-batch"
+    else 
+        NAME = "unet-baseline-sh-200d"
+    end 
+
+    SAVE_DIR = "results/speedy/"
+end 
+
 
 other_hyperpars = NeuralQG3.training_hyperpars()
 (; N_batch, DT_FAC, data_length) = other_hyperpars
@@ -44,8 +61,9 @@ train = NODEData.NODEDataloader_insertdim(train, 2)
 test = NODEData.NODEDataloader_insertdim(test, 2)
 
 # load PSN 
+process_based = !BASELINE
 S = psn_hyperpars.pars[:additional_knowledge] ? S : nothing
-neural_de_sciml, ps, st = NeuralQG3.load_psn_sciml(qg3p, psn_hyperpars, DT; alg=Tsit5(), dtmax=DT, maxiters=1e7, reltol=1e-3, SAVE_NAME=SAVE_NAME, device=DEV, S=S)
+neural_de_sciml, ps, st = NeuralQG3.load_psn_sciml(qg3p, psn_hyperpars, DT; alg=Tsit5(), process_based=process_based, dtmax=DT, maxiters=1e7, reltol=1e-3, SAVE_NAME=SAVE_NAME, device=DEV, S=S)
 test_trajectory = NODEData.get_trajectory(test, 300)
 
 # setup forecast task 
@@ -100,8 +118,14 @@ println("Now eval stability:")
 N_t_month = Int(floor(30 / (DT * qg3p.p.time_unit))) # 30 days
 N_t_year = N_t_month*12 # 360 days 
 
-SAVE_NAME_BASE_PSN = string(SAVE_DIR,"Spectrum-Year-PSN-")
-SAVE_NAME_TRUTH = string(SAVE_DIR,"Spectrum-Year-GT-")
+if BASELINE
+    MODEL_NAME = "Baseline"
+else 
+    MODEL_NAME = "PSN"
+end 
+
+SAVE_NAME_BASE_PSN = string(SAVE_DIR,"Spectrum-",MODEL_NAME,"-",DATA_MODEL,"-")
+SAVE_NAME_TRUTH = string(SAVE_DIR,"Spectrum-GT-",DATA_MODEL,"-")
 
 function compute_spectra(model, ps, st, ic, save_name; N=10, N_months_res=1, N_years_evolve=5)
 
@@ -109,6 +133,10 @@ function compute_spectra(model, ps, st, ic, save_name; N=10, N_months_res=1, N_y
 
     for i=1:N
 
+        # evolve by five years and use at new ic for next iteration
+        spectrum_input = NeuralDELux.evolve(model, ps, st, spectrum_input; N_t=N_years_evolve*N_t_year)
+        spectrum_input = reshape(spectrum_input, (size(spectrum_input)..., 1))
+ 
         res, __ = model((range(start=0, step=DT, length=N_months_res*N_t_month), spectrum_input), ps, st)
 
         # compute spectra 
@@ -117,25 +145,23 @@ function compute_spectra(model, ps, st, ic, save_name; N=10, N_months_res=1, N_y
         S_3 = average_angular_power_spectrum(res[3,..], qg3ppars)
     
         # save spectra 
-        save_name_i = string(save_name, "-m",N_months_res,"-",i,".jld2")
+        save_name_i = string(save_name, "ev", N_years_evolve, "-m",N_months_res,"-",i,".jld2")
         jldsave(save_name_i; S_1, S_2, S_3)
-    
-        # evolve by five years and use at new ic for next iteration
-        spectrum_input = NeuralDELux.evolve(model, ps, st, res[..,end]; N_t=N_years_evolve*N_t_year)
-        spectrum_input = reshape(spectrum_input, (size(spectrum_input)..., 1))
 
+        spectrum_input = res[..,end]
+        
     end 
     return nothing 
 end 
 
 #PSN 
-compute_spectra(neural_de_sciml, ps, st, test_trajectory[2][..,end:end], SAVE_NAME_BASE_PSN, N_months_res=1)
+compute_spectra(neural_de_sciml, ps, st, test_trajectory[2][..,end], SAVE_NAME_BASE_PSN, N_months_res=36, N_years_evolve=0, N=20)
 
 #GT 
 
 println("Done with PSN, now Ground Truth...")
 qg3_sciml = NeuralQG3.QG3Baseline(qg3p; dt=DT)
-compute_spectra(qg3_sciml, nothing, NamedTuple(), test_trajectory[2][..,1,end:end], SAVE_NAME_TRUTH, N_months_res=12)
+#compute_spectra(qg3_sciml, nothing, NamedTuple(), test_trajectory[2][..,1,end], SAVE_NAME_TRUTH, N_months_res=36, N_years_evolve=3, N=12)
 
 println("Done with GT, finished!")
 
