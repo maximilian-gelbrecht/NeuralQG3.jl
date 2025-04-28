@@ -65,6 +65,7 @@ process_based = !BASELINE
 S = psn_hyperpars.pars[:additional_knowledge] ? S : nothing
 neural_de_sciml, ps, st = NeuralQG3.load_psn_sciml(qg3p, psn_hyperpars, DT; alg=Tsit5(), process_based=process_based, dtmax=DT, maxiters=1e7, reltol=1e-3, SAVE_NAME=SAVE_NAME, device=DEV, S=S)
 test_trajectory = NODEData.get_trajectory(test, 300)
+train_trajectory = NODEData.get_trajectory(train, 100)
 
 # setup forecast task 
 grid_forecast = NeuralQG3.GridForecast(test_trajectory, qg3p.g.SHtoG,input_SH=true, output_SH=true, data_SH=true, trajectory_call=false)
@@ -155,13 +156,12 @@ function compute_spectra(model, ps, st, ic, save_name; N=10, N_months_res=1, N_y
 end 
 
 #PSN 
-compute_spectra(neural_de_sciml, ps, st, test_trajectory[2][..,end], SAVE_NAME_BASE_PSN, N_months_res=36, N_years_evolve=0, N=20)
+compute_spectra(neural_de_sciml, ps, st, train_trajectory[2][..,end], SAVE_NAME_BASE_PSN, N_months_res=36, N_years_evolve=3, N=10)
 
 #GT 
-
 println("Done with PSN, now Ground Truth...")
 qg3_sciml = NeuralQG3.QG3Baseline(qg3p; dt=DT)
-#compute_spectra(qg3_sciml, nothing, NamedTuple(), test_trajectory[2][..,1,end], SAVE_NAME_TRUTH, N_months_res=36, N_years_evolve=3, N=12)
+#compute_spectra(qg3_sciml, nothing, NamedTuple(), train_trajectory[2][..,1,end], SAVE_NAME_TRUTH, N_months_res=36, N_years_evolve=3, N=12)
 
 println("Done with GT, finished!")
 
