@@ -156,7 +156,7 @@ function compute_spectra(model, ps, st, ic, save_name; N=10, N_months_res=1, N_y
 end 
 
 #PSN 
-compute_spectra(neural_de_sciml, ps, st, train_trajectory[2][..,end], SAVE_NAME_BASE_PSN, N_months_res=36, N_years_evolve=3, N=10)
+compute_spectra(neural_de_sciml, ps, st, train_trajectory[2][..,end], SAVE_NAME_BASE_PSN, N_months_res=48, N_years_evolve=4, N=10)
 
 #GT 
 println("Done with PSN, now Ground Truth...")
